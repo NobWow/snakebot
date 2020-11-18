@@ -1177,12 +1177,10 @@ def loadConf():
             fl = open(conff,'r')
             conf = json.loads(fl.read())
         else:
-            print('It seems that data file has never been created, creating an empty file.')
-            fl = open(dataf,'x')
-            # TODO
-            data = {'templates':{'guilds':[],'roles':[],'channels':[]},'user_data':{},'guild_data':{}}
-            fl.write(json.dumps(data),indent=True)
+            fl = open(conff,'x')
+            fl.write(json.dumps(conftemplate,indent=True))
             fl.close()
+            print('The example configuration has been created, enter bot token in them')
     except json.JSONDecodeError as exc:
         print('The configuration file is broken.')
         print(exc)
@@ -1197,16 +1195,17 @@ def loadData():
     logger.info('Loading data...')
     global data
     try:
-        fl = open(dataf,'r')
-        data = json.loads(fl.read())
-    except FileNotFoundError:
-        print('It seems that data file has never been created, creating an empty file.')
-        fl = open(dataf,'x')
-        # TODO
-        data_tmpl = {'templates':{'guilds':[],'roles':[],'channels':[]},'user_data':{},'guild_data':{}}
-        fl.write(json.dumps(data_tmpl),indent=True)
-        fl.close()
-        data = data_tmpl
+        if not os.path.isfile(dataf):
+            print('It seems that data file has never been created, creating an empty file.')
+            fl = open(dataf,'x')
+            # TODO
+            data_tmpl = {'templates':{'guilds':[],'roles':[],'channels':[]},'user_data':{},'guild_data':{}}
+            fl.write(json.dumps(data_tmpl),indent=True)
+            fl.close()
+            data = data_tmpl
+        else:
+            fl = open(dataf,'r')
+            data = json.loads(fl.read())
     except json.JSONDecodeError as exc:
         print('The data file is broken.')
         print(exc)

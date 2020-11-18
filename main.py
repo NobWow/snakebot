@@ -1181,6 +1181,7 @@ def loadConf():
             fl.write(json.dumps(conftemplate,indent=True))
             fl.close()
             print('The example configuration has been created, enter bot token in them')
+            exit(0)
     except json.JSONDecodeError as exc:
         print('The configuration file is broken.')
         print(exc)
@@ -1200,7 +1201,7 @@ def loadData():
             fl = open(dataf,'x')
             # TODO
             data_tmpl = {'templates':{'guilds':[],'roles':[],'channels':[]},'user_data':{},'guild_data':{}}
-            fl.write(json.dumps(data_tmpl),indent=True)
+            fl.write(json.dumps(data_tmpl,indent=True))
             fl.close()
             data = data_tmpl
         else:

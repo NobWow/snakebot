@@ -4,7 +4,7 @@ import discord, asyncio, time, datetime, logging, math, json, traceback, importl
 from discord.ext import commands
 from threading import Thread
 import sys, os
-global conff, tempsf
+
 conff = 'conf.json'
 dataf = 'data.json'
 langfold = 'languages'
@@ -43,7 +43,7 @@ class State:
 conftemplate = {
 	'token':'put your bot token here',
 	'prefix':['.','#'],
-	'default_lang':'ru_RU',
+	'default_lang':'en_US',
 	'owner_permission_bypass': False,
 	'messages': {
 		'check_failures': {

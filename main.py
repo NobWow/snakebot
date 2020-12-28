@@ -639,7 +639,7 @@ langtemplate = {
                     },
                     'authorban_banned_guild': {
                         'title': 'This guild has been banned from this bot',
-                        'description': 'The functionality of the bot is locked on this guild from now by the bot author. \nYou cannot use bot on this guild until it expires or the bot\'s author manually removes the ban.\nReason: %(reason)s\nExpiration date: %(exp_date)s.',
+                        'description': 'The functionality of the bot is locked on this guild from now by the bot author. \nYou cannot use bot on this guild until it expires or the bot\'s author manually removes the ban.\nReason: %(reason)s\nExpiration date: %(date_exp)s.',
                         'footer': 'The bot is still available in DMs or another guilds.'
                     },
                     'authorban_unbanned_guild': {
@@ -1310,6 +1310,8 @@ class GuildConverter(commands.Converter):
     def __init__(self, *args, **kwargs):
         commands.Converter.__init__(self, *args, **kwargs)
     async def convert(self, ctx, arg):
+        if ctx.guild and (arg == "" or arg == "-"):
+            return ctx.guild
         #arg = str(arg)
         if arg.isnumeric():
             #search by id
@@ -1341,6 +1343,7 @@ class PtDiscordBot(commands.Bot):
         self.validateLang = validateLang
         self.loadLangs = loadLangs
         self.tasks = {'ab': {}, 'aab': {}, 'abh': {}, 'abg': {}, 'gab': {}, 'gabh': {}, 'sched': {}, 'longcmd': {}}
+        self.local_tz: datetime.timezone = None
         self.loadMods()
 
         #Global checks
@@ -1564,7 +1567,7 @@ class PtDiscordBot(commands.Bot):
             else:
                 langcode = list(self.lang.keys())[langslc.index(language.lower())]
                 if user is not None:
-                    targetuser = self.wrapped_convert(ctx, commands.MemberConverter, commands.UserConverter, user)
+                    targetuser = await self.wrapped_convert(ctx, commands.MemberConverter, commands.UserConverter, user)
                     if not targetuser:
                         return None
                     if str(targetuser.id) not in self.data['user_data']:
@@ -1602,7 +1605,6 @@ class PtDiscordBot(commands.Bot):
         @commands.command(usage="[language code]")
         async def setguildlang(ctx, language, guild=None):
             if guild is not None and ctx.author.id != self.owner_id:
-                #raise commands.NotOwner("You are not allowed to change language for another user.")
                 guild=None
             #_lang = self.getLanguage(ctx.author.id, ctx.guild.id if ctx.guild else None, self.lang.keys())
             langslc = [x.lower() for x in self.lang.keys()]
@@ -1618,8 +1620,9 @@ class PtDiscordBot(commands.Bot):
                     #if not ctx.author.id in [m.id for m in targetguild.members] and ctx.author.id != self.owner_id:
                     #    await ctx.send(**self.renderMessage(self.lang[_lang], langtemplate, 'common_errors', self.conf, conftemplate, 'NotFound', item=guild))
                     #    return None
-                    self.runtime_check_guild_lpl(targetguild, ctx.author, 3)
-                    self.runtime_check_guild_authoradminban(targetguild, ctx.author)
+                    if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                        self.runtime_check_guild_lpl(targetguild, ctx.author, 3)
+                        self.runtime_check_guild_authoradminban(targetguild, ctx.author)
                     if str(targetguild.id) not in self.data['guild_data']:
                         self.data['guild_data'][str(targetguild.id)] = {}
                     self.data['guild_data'][str(targetguild.id)]['language'] = langcode
@@ -1646,7 +1649,8 @@ class PtDiscordBot(commands.Bot):
                 if not ctx.author.id in [m.id for m in targetguild.members] and ctx.author.id != self.owner_id:
                     await ctx.send(**self.renderMessage(self.lang[_lang], langtemplate, 'common_errors', self.conf, conftemplate, 'NotFound', item=guild))
                     return None
-                self.runtime_check_guild_admin_ban(targetguild, ctx.author)
+                if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                    self.runtime_check_guild_admin_ban(targetguild, ctx.author)
                 if str(targetguild.id) not in self.data['guild_data']:
                     langcode = 'default'
                 else:
@@ -1680,11 +1684,12 @@ class PtDiscordBot(commands.Bot):
             #...
             ctx.guild = targetguild
             #
-            targetuser = await self.wrapped_convert(ctx, discord.MemberConverter, discord.UserConverter, user)
+            targetuser = await self.wrapped_convert(ctx, commands.MemberConverter, commands.UserConverter, user)
             if not targetuser:
                 return
-            self.runtime_check_guild_ownership(ctx.author.id, targetguild)
-            self.runtime_check_guild_authoradminban(targetguild)
+            if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                self.runtime_check_guild_ownership(targetguild, ctx.author)
+                self.runtime_check_guild_authoradminban(targetguild)
             if not str(targetguild.id) in self.data['guild_data']:
                 self.data['guild_data'][str(targetguild.id)] = {}
             if not 'user_permission_levels' in self.data['guild_data'][str(targetguild.id)]:
@@ -1699,37 +1704,54 @@ class PtDiscordBot(commands.Bot):
         #Local permission level, but for role
         @commands.command()
         async def setrolelevel(ctx, role, value, guild=None):
+            print(1)
             if guild is not None:
                 targetguild = await self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
                 if not targetguild:
+                    print(2)
                     return
             elif not ctx.guild:
+                print(3)
                 _lang = self.getLanguage(ctx.author.id, ctx.guild.id if ctx.guild else None, self.lang)
                 await ctx.send(**self.renderMessage(self.lang[_lang], langtemplate, 'command_errors', self.conf, conftemplate, 'MissingRequiredArgument', param='guild'))
                 return
             else:
                 targetguild = ctx.guild
+                print(4)
             #...
             ctx.guild = targetguild
             #
-            targetrole = await self.wrapped_convert(ctx, discord.RoleConverter, discord.RoleConverter, role)
+            print(5)
+            targetrole = await self.wrapped_convert(ctx, commands.RoleConverter, commands.RoleConverter, role)
             if not targetrole:
+                print(6)
                 return
-            self.runtime_check_guild_ownership(ctx.author.id, targetguild)
-            self.runtime_check_guild_authoradminban(targetguild)
+            if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                print(ctx.author.id)
+                print(self.owner_id)
+                self.runtime_check_guild_ownership(targetguild,ctx.author)
+                self.runtime_check_guild_authoradminban(targetguild)
             if not str(targetguild.id) in self.data['guild_data']:
+                print(8)
                 self.data['guild_data'][str(targetguild.id)] = {}
             if not 'role_settings' in self.data['guild_data'][str(targetguild.id)]:
+                print(9)
                 self.data['guild_data'][str(targetguild.id)]['role_settings'] = {}
             if not str(targetrole.id) in self.data['guild_data'][str(targetguild.id)]['role_settings']:
+                print(10)
                 self.data['guild_data'][str(targetguild.id)]['role_settings'][str(targetrole.id)] = {}
             try:
+                print(11)
                 self.data['guild_data'][str(targetguild.id)]['role_settings'][str(targetrole.id)]['local_permission_level'] = int(value)
                 self.savedata()
+                print(12)
             except ValueError:
                 raise InvalidNumber('Invalid number: %s'%value, invalid_number=value)
+                print(13)
             _lang = self.getLanguage(ctx.author.id, ctx.guild.id if ctx.guild else None, self.lang)
+            print(14)
             await ctx.send(**self.renderMessage(self.lang[_lang], langtemplate, 'info', self.conf, conftemplate, 'lpl_role_set', role_id=targetrole.id, role_name=targetrole.name, guild_name=targetguild.name, guild_id=targetguild.id, lpl_value=int(value)))
+            print(15)
         #Remote access
         @commands.command()
         async def setremote(ctx, logic, user=None, guild=None):
@@ -1743,10 +1765,11 @@ class PtDiscordBot(commands.Bot):
                 return
             else:
                 targetguild = ctx.guild
-            self.runtime_check_authorban_guild(targetguild, ctx.author)
-            self.runtime_check_guild_lpl(targetguild, ctx.author, 3)
+            if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                self.runtime_check_authorban_guild(targetguild, ctx.author)
+                self.runtime_check_guild_lpl(targetguild, ctx.author, 3)
             if user:
-                targetuser = await self.wrapped_convert(ctx, discord.MemberConverter, discord.UserConverter, user)
+                targetuser = await self.wrapped_convert(ctx, commands.MemberConverter, commands.UserConverter, user)
                 if not targetuser:
                     return
             else:
@@ -1765,7 +1788,7 @@ class PtDiscordBot(commands.Bot):
         async def setnotifychannel(ctx, channel=None, guild=None):
             _lang = self.getLanguage(ctx.author.id, ctx.guild.id if ctx.guild else None, self.lang)
             if guild:
-                targetguild = self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
+                targetguild = await self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
                 if not targetguild:
                     return
                 targetchannel = self.findchannel(targetguild, channel)
@@ -1778,9 +1801,10 @@ class PtDiscordBot(commands.Bot):
                     targetchannel = self.findchannel(targetguild, channel)
                 else:
                     targetchannel = ctx.channel
-            self.runtime_check_authorban_guild(targetguild, ctx.author)
-            self.runtime_check_guild_authoradminban(targetguild, ctx.author)
-            self.runtime_check_guild_lpl(targetguild, ctx.author, 3)
+            if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                self.runtime_check_authorban_guild(targetguild, ctx.author)
+                self.runtime_check_guild_authoradminban(targetguild, ctx.author)
+                self.runtime_check_guild_lpl(targetguild, ctx.author, 3)
             if str(targetguild.id) not in self.data['guild_data']:
                 self.data['guild_data'][str(targetguild.id)] = {}
             self.data['guild_data'][str(targetguild.id)]['notify_channel'] = targetchannel.id
@@ -1796,8 +1820,8 @@ class PtDiscordBot(commands.Bot):
             if str(targetuser.id) not in self.data['user_data']:
                 self.data['user_data'][str(targetuser.id)] = {}
             self.data['user_data'][str(targetuser.id)]['author_ban'] = {'reason': reason}
-            if date.lower() != '' or date.lower() != self.lang[_lang]['contents']['formats']['date_relative']['never']:
-                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date)
+            if date.lower() != '' or date.lower() != _lang['contents']['formats']['date_relative']['never'].lower() or date.lower() != self.lang[_lang]['contents']['formats']['date_relative']['never']:
+                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date.lower())
                 self.data['user_data'][str(targetuser.id)]['author_ban']['date_exp'] = {
                     'year': date_exp.year,
                     'month': date_exp.month,
@@ -1875,8 +1899,8 @@ class PtDiscordBot(commands.Bot):
             #    self.data['user_data'][str(targetuser.id)]['author_ban_places'][str(targetchannel.guild.id)][str(targetchannel.id)] = {}
             #[str(targetchannel.guild.id)][str(targetchannel.id)]
             self.data['user_data'][str(targetuser.id)]['author_ban_places'][str(targetchannel.guild.id)][str(targetchannel.id)] = {'reason': reason}
-            if date.lower() != '' or date.lower() != self.lang[_lang]['contents']['formats']['date_relative']['never']:
-                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date)
+            if date.lower() != '' or date.lower() != _lang['contents']['formats']['date_relative']['never'].lower() or date.lower() != self.lang[_lang]['contents']['formats']['date_relative']['never']:
+                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date.lower())
                 self.data['user_data'][str(targetuser.id)]['author_ban_places'][str(targetchannel.guild.id)][str(targetchannel.id)]['date_exp'] = {
                     'year': date_exp.year,
                     'month': date_exp.month,
@@ -1949,7 +1973,7 @@ class PtDiscordBot(commands.Bot):
         async def aadminban(ctx, guild='', date='', *, reason=''):
             _lang = self.getLanguage(ctx.author.id, ctx.guild.id if ctx.guild else None, self.lang)
             if guild:
-                targetguild = self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
+                targetguild = await self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
                 if not targetguild:
                     return None
             else:
@@ -1960,8 +1984,8 @@ class PtDiscordBot(commands.Bot):
             if str(targetguild.id) not in self.data['guild_data']:
                 self.data['guild_data'][str(targetguild.id)] = {}
             self.data['guild_data'][str(targetguild.id)]['author_administration_ban'] = {'reason': reason}
-            if date.lower() != '' or date.lower() is not self.lang[_lang]['contents']['formats']['date_relative']['never']:
-                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date)
+            if date.lower() != '' or date.lower() != _lang['contents']['formats']['date_relative']['never'].lower() or date.lower() is not self.lang[_lang]['contents']['formats']['date_relative']['never']:
+                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date.lower())
                 self.data['guild_data'][str(targetguild.id)]['author_administration_ban']['date_exp'] = {
                     'year': date_exp.year,
                     'month': date_exp.month,
@@ -1994,7 +2018,7 @@ class PtDiscordBot(commands.Bot):
         async def unaadminban(ctx, guild=''):
             _lang = self.getLanguage(ctx.author.id, ctx.guild.id if ctx.guild else None, self.lang)
             if guild:
-                targetguild = self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
+                targetguild = await self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
                 if not targetguild:
                     return None
             else:
@@ -2022,10 +2046,10 @@ class PtDiscordBot(commands.Bot):
                 pass
         @commands.command()
         @commands.is_owner()
-        async def abanguild(ctx, guild='', date=Never, *, reason=None):
-            _lang = self.getLanguage(ctx.user.id, ctx.guild.id if ctx.guild else None, self.lang)
+        async def abanguild(ctx, guild='', date='', *, reason=None):
+            _lang = self.getLanguage(ctx.author.id, ctx.guild.id if ctx.guild else None, self.lang)
             if guild:
-                targetguild = self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
+                targetguild = await self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
                 if not targetguild:
                     return
             elif not ctx.guild:
@@ -2036,8 +2060,8 @@ class PtDiscordBot(commands.Bot):
             if str(targetguild.id) not in self.data['guild_data']:
                 self.data['guild_data'][str(targetguild.id)] = {}
             self.data['guild_data'][str(targetguild.id)]['author_ban'] = {'reason': reason}
-            if date.lower() != '' or date.lower() is not self.lang[_lang]['contents']['formats']['date_relative']['never']:
-                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date)
+            if date.lower() != '' or date.lower() != _lang['contents']['formats']['date_relative']['never'].lower() or date.lower() is not self.lang[_lang]['contents']['formats']['date_relative']['never']:
+                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date.lower())
                 self.data['guild_data'][str(targetguild.id)]['author_ban']['date_exp'] = {
                     'year': date_exp.year,
                     'month': date_exp.month,
@@ -2070,7 +2094,7 @@ class PtDiscordBot(commands.Bot):
         async def unabanguild(ctx, guild=''):
             _lang = self.getLanguage(ctx.author.id, ctx.guild.id if ctx.guild else None, self.lang)
             if guild:
-                targetguild = self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
+                targetguild = await self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
                 if not targetguild:
                     return None
             else:
@@ -2097,7 +2121,7 @@ class PtDiscordBot(commands.Bot):
             except discord.Forbidden:
                 pass
         @commands.command()
-        async def ban(ctx, user, date=Never, guild=None, *, reason=None):
+        async def ban(ctx, user, date='', guild=None, *, reason=None):
             _lang = self.getLanguage(ctx.author.id, ctx.guild.id if ctx.guild else None, self.lang)
             if guild:
                 targetguild = await self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
@@ -2108,13 +2132,14 @@ class PtDiscordBot(commands.Bot):
                 return
             else:
                 targetguild = ctx.guild
-            self.runtime_check_authorban_guild(targetguild, ctx.author)
-            self.runtime_check_guild_authoradminban(targetguild, ctx.author)
-            self.runtime_check_guild_lpl(targetguild, ctx.author, 2)
+            if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                self.runtime_check_authorban_guild(targetguild, ctx.author)
+                self.runtime_check_guild_authoradminban(targetguild, ctx.author)
+                self.runtime_check_guild_lpl(targetguild, ctx.author, 2)
             #hmm...
             ctx.guild = targetguild
             #
-            targetuser = await self.wrapped_convert(ctx, discord.MemberConverter, discord.UserConverter, user)
+            targetuser = await self.wrapped_convert(ctx, commands.MemberConverter, commands.UserConverter, user)
             if not targetuser:
                 return
             if targetuser.id == ctx.author.id:
@@ -2129,8 +2154,8 @@ class PtDiscordBot(commands.Bot):
             if 'banned_users' not in self.data['guild_data'][str(targetguild.id)]:
                 self.data['guild_data'][str(targetguild.id)]['banned_users'] = {}
             self.data['guild_data'][str(targetguild.id)]['banned_users'][str(targetuser.id)] = {'reason': reason}
-            if date.lower() != '' or date.lower() != self.lang[_lang]['contents']['formats']['date_relative']['never']:
-                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date)
+            if date.lower() != '' or date.lower() != _lang['contents']['formats']['date_relative']['never'].lower():
+                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date.lower())
                 self.data['guild_data'][str(targetguild.id)]['banned_users'][str(targetuser.id)]['date_exp'] = {
                     'year': date_exp.year,
                     'month': date_exp.month,
@@ -2156,7 +2181,7 @@ class PtDiscordBot(commands.Bot):
             except discord.Forbidden:
                 pass
         @commands.command()
-        async def banhere(ctx, user, date=Never, channel=None, guild=None, *, reason=None):
+        async def banhere(ctx, user, date='', channel=None, guild=None, *, reason=None):
             _lang = self.getLanguage(ctx.author.id, ctx.guild.id if ctx.guild else None, self.lang)
             if guild:
                 targetguild = await self.wrapped_convert(ctx, GuildConverter, GuildConverter, guild)
@@ -2174,13 +2199,14 @@ class PtDiscordBot(commands.Bot):
                 return
             else:
                 targetchannel = ctx.channel
-            self.runtime_check_authorban_guild(targetguild, ctx.author)
-            self.runtime_check_guild_authoradminban(targetguild, ctx.author)
-            self.runtime_check_guild_lpl(targetguild, ctx.author, 2)
+            if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                self.runtime_check_authorban_guild(targetguild, ctx.author)
+                self.runtime_check_guild_authoradminban(targetguild, ctx.author)
+                self.runtime_check_guild_lpl(targetguild, ctx.author, 2)
             #wait... this is illegal
             ctx.guild = targetguild
             #
-            targetuser = await self.wrapped_convert(ctx, discord.MemberConverter, discord.UserConverter, user)
+            targetuser = await self.wrapped_convert(ctx, commands.MemberConverter, commands.UserConverter, user)
             if not targetuser:
                 return
             if targetuser.id == ctx.author.id:
@@ -2197,8 +2223,8 @@ class PtDiscordBot(commands.Bot):
             if str(targetchannel.id) not in self.data['guild_data'][str(targetguild.id)]['placebanned_users']:
                 self.data['guild_data'][str(targetguild.id)]['placebanned_users'][str(targetchannel.id)] = {}
             self.data['guild_data'][str(targetguild.id)]['placebanned_users'][str(targetchannel.id)][str(targetuser.id)] = {'reason': reason}
-            if date.lower() != '' or date.lower() != self.lang[_lang]['contents']['formats']['date_relative']['never']:
-                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date)
+            if date.lower() != '' or date.lower() != self.lang[_lang]['contents']['formats']['date_relative']['never'].lower():
+                date_exp = datetime.datetime.now() + self.parseDuration(langtemplate['contents']['formats']['duration'], date.lower())
                 self.data['guild_data'][str(targetguild.id)]['placebanned_users'][str(targetchannel.id)][str(targetuser.id)] = {
                     'year': date_exp.year,
                     'month': date_exp.month,
@@ -2237,9 +2263,10 @@ class PtDiscordBot(commands.Bot):
             #NOW this is really bad
             ctx.guild = targetguild
             #
-            self.runtime_check_authorban_guild(targetguild, ctx.author.id)
-            self.runtime_check_guild_authoradminban(targetguild, ctx.author.id)
-            self.runtime_check_guild_lpl(targetguild, ctx.author.id, 2)
+            if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                self.runtime_check_authorban_guild(targetguild, ctx.author.id)
+                self.runtime_check_guild_authoradminban(targetguild, ctx.author.id)
+                self.runtime_check_guild_lpl(targetguild, ctx.author.id, 2)
             targetuser = await self.wrapped_convert(ctx, commands.MemberConverter, commands.UserConverter, user)
             if not targetuser:
                 return None
@@ -2273,9 +2300,10 @@ class PtDiscordBot(commands.Bot):
             #NOW this is really bad
             ctx.guild = targetguild
             #
-            self.runtime_check_authorban_guild(targetguild, ctx.author.id)
-            self.runtime_check_guild_authoradminban(targetguild, ctx.author.id)
-            self.runtime_check_guild_lpl(targetguild, ctx.author.id, 2)
+            if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                self.runtime_check_authorban_guild(targetguild, ctx.author.id)
+                self.runtime_check_guild_authoradminban(targetguild, ctx.author.id)
+                self.runtime_check_guild_lpl(targetguild, ctx.author.id, 2)
             targetuser = await self.wrapped_convert(ctx, commands.MemberConverter, commands.UserConverter, user)
             if not targetuser:
                 return None
@@ -2338,9 +2366,10 @@ class PtDiscordBot(commands.Bot):
             #
             ctx.guild = targetguild
             #
-            self.runtime_check_authorban_guild(targetguild, ctx.author.id)
-            self.runtime_check_guild_authoradminban(targetguild, ctx.author.id)
-            self.runtime_check_guild_lpl(targetguild, ctx.author.id, 2)
+            if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                self.runtime_check_authorban_guild(targetguild, ctx.author.id)
+                self.runtime_check_guild_authoradminban(targetguild, ctx.author.id)
+                self.runtime_check_guild_lpl(targetguild, ctx.author.id, 2)
             fields = []
             for userid in self.data['guild_data'][str(targetguild.id)]['banned_users']:
                 ban = self.data['guild_data'][str(targetguild.id)]['banned_users'][userid]
@@ -2374,12 +2403,13 @@ class PtDiscordBot(commands.Bot):
             ctx.guild = targetguild
             #
             if channel:
-                targetchannel = self.wrapped_convert(ctx, discord.TextChannelConverter, discord.TextChannelConverter, channel)
+                targetchannel = await self.wrapped_convert(ctx, commands.TextChannelConverter, commands.TextChannelConverter, channel)
                 if not targetchannel:
                     return
-            self.runtime_check_authorban_guild(targetguild, ctx.author.id)
-            self.runtime_check_guild_authoradminban(targetguild, ctx.author.id)
-            self.runtime_check_guild_lpl(targetguild, ctx.author.id, 2)
+            if not (ctx.author.id == self.owner_id and self.conf['owner_permission_bypass']):
+                self.runtime_check_authorban_guild(targetguild, ctx.author.id)
+                self.runtime_check_guild_authoradminban(targetguild, ctx.author.id)
+                self.runtime_check_guild_lpl(targetguild, ctx.author.id, 2)
             fields = []
         self.add_command(langs)
         self.add_command(setlang)
@@ -2444,15 +2474,15 @@ class PtDiscordBot(commands.Bot):
         else:
             return guild in self.get_visible_guilds(user)
     def get_visible_guilds(self, user):
-        #if user.id == self.owner_id:
-        #    return self.guilds
+        if user.id == self.owner_id and self.conf['owner_permission_bypass']:
+            return self.guilds
         _guilds = []
         for guild in self.guilds:
             try:
                 isremote = str(user.id) in self.data['guild_data'][str(guild.id)]['remote_users']
             except KeyError:
                 isremote = False
-            if self.is_in_guild(guild, user) or isremote or user.id == self.owner_id:
+            if guild.get_member(user.id) or isremote or user.id == self.owner_id:
                 _guilds.append(guild)
         return _guilds
     async def authorban_expiry_timer(self, id):
@@ -3044,6 +3074,8 @@ class PtDiscordBot(commands.Bot):
             return _langs, missing_fields, insuf_fields
     async def on_ready(self):
         print('We have logged in as {0.user}'.format(self))
+        app_info = await self.application_info()
+        self.owner_id = app_info.owner.id
     async def start(self, *args, **kwargs):
         # --- Do something after that event loop has been started
         #init authorban timers
@@ -3469,10 +3501,11 @@ def main(args):
     if not loadLangs():
         exit(1)
     loop = asyncio.get_event_loop()
+    intents = discord.Intents(members=True, bans=True, emojis=True, guilds=True, integrations=True, webhooks=True, invites=True, voice_states=True, messages=True, guild_messages=True, dm_messages=True, reactions=True, guild_reactions=True, dm_reactions=True, typing=True, guild_typing=True, dm_typing=True)
     if 'owner' in conf.keys():
-        bot = PtDiscordBot(logger, conf, data, lang, command_prefix=tuple(conf['prefix']), owner_id=int(conf['owner']))
+        bot = PtDiscordBot(logger, conf, data, lang, command_prefix=tuple(conf['prefix']), owner_id=int(conf['owner']), intents=intents)
     else:
-        bot = PtDiscordBot(logger, conf, data, lang, command_prefix=tuple(conf['prefix']))
+        bot = PtDiscordBot(logger, conf, data, lang, command_prefix=tuple(conf['prefix']), intents=intents)
     @bot.command()
     @commands.is_owner()
     async def shutdown(ctx):

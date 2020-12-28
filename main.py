@@ -42,7 +42,7 @@ class State:
 #Default configuration.
 conftemplate = {
     'token':'put your bot token here',
-    'prefix':['.','#'],
+    'prefix':['&'],
     'default_lang':'en_US',
     'owner_permission_bypass': False,
     'messages': {

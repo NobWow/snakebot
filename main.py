@@ -2735,7 +2735,7 @@ class PtDiscordBot(commands.Bot):
             targetchannel = discord.utils.get(guild.text_channels, id=int(channel))
             if not targetchannel:
                 self.debug_print('findchannel: channel not found', 'bot_utility')
-                raise NotFound('Channel with ID %s not found'%channel, item=channel)
+                raise NotFound(message='Channel with ID %s not found'%channel, response=404, item=channel)
                 return None
         elif str(channel).startswith('<#') and str(channel).endswith('>'):
             self.debug_print('findchannel: channel mention is given', 'bot_utility')
@@ -2743,14 +2743,14 @@ class PtDiscordBot(commands.Bot):
                 channel_id = int( str(channel).removeprefix('<#').removesuffix('>') )
             except ValueError:
                 self.debug_print('findchannel: something went wrong', 'bot_utility')
-                raise NotFound('Channel with mention %s not found'%channel, item=channel)
+                raise NotFound(message='Channel with mention %s not found'%channel, response=404, item=channel)
                 return None
             self.debug_print('findchannel: retrieving channel by ID: %s' % channel_id, 'bot_utility')
             #targetchannel = discord.utils.get(guild.text_channels, id=int(channel_id))
             targetchannel = guild.get_channel(channel_id)
             if not targetchannel:
                 self.debug_print('findchannel: channel not found', 'bot_utility')
-                raise NotFound('Channel with ID %s not found'%channel, item=channel)
+                raise NotFound(message='Channel with ID %s not found'%channel, response=404, item=channel)
                 return None
             self.debug_print('findchannel: success', 'bot_utility')
             return targetchannel
@@ -2759,7 +2759,7 @@ class PtDiscordBot(commands.Bot):
             targetchannel = discord.utils.get(guild.text_channels, name=channel)
             if not targetchannel:
                 self.debug_print('findchannel: channel not found', 'bot_utility')
-                raise NotFound('Channel with name %s not found'%channel, item=channel)
+                raise NotFound(message='Channel with name %s not found'%channel, response=404, item=channel)
                 return None
             return targetchannel
     def findcategory(self, guild, category):
@@ -2769,7 +2769,7 @@ class PtDiscordBot(commands.Bot):
             targetcategory = discord.utils.get(guild.categories, id=int(category))
             if not targetcategory:
                 self.debug_print('findcategory: category not found', 'bot_utility')
-                raise NotFound('category with ID %s not found'%category, item=category)
+                raise NotFound(message='category with ID %s not found'%category, response=404, item=category)
                 return None
         elif str(category).startswith('<#') and str(category).endswith('>'):
             self.debug_print('findcategory: channel mention is given', 'bot_utility')
@@ -2777,13 +2777,13 @@ class PtDiscordBot(commands.Bot):
                 channel_id = int( str(category).removeprefix('<#').removesuffix('>') )
             except ValueError:
                 self.debug_print('findcategory: something went wrong', 'bot_utility')
-                raise NotFound('channel with mention %s not found'%category, item=category)
+                raise NotFound(message='channel with mention %s not found'%category, response=404, item=category)
                 return None
             self.debug_print('findcategory: retrieving channel by ID: %s' % channel_id, 'bot_utility')
             targetcategory = guild.get_channel(channel_id).category
             if not targetcategory:
                 self.debug_print('findcategory: category not found', 'bot_utility')
-                raise NotFound('category with ID %s not found'%category, item=category)
+                raise NotFound(message='category with ID %s not found'%category, response=404, item=category)
                 return None
             else:
                 self.debug_print('fundcategory: from channel category retrieved: ID %s NAME %s' % (targetcategory.id, targetcategory.name))
@@ -2794,7 +2794,7 @@ class PtDiscordBot(commands.Bot):
             targetcategory = discord.utils.get(guild.categories, name=category)
             if not targetcategory:
                 self.debug_print('findcategory: category not found', 'bot_utility')
-                raise NotFound('category with name %s not found'%category, item=category)
+                raise NotFound(message='category with name %s not found'%category, response=404, item=category)
                 return None
             return targetcategory
     def is_in_guild(self, guild, user):
@@ -3308,6 +3308,11 @@ class PtDiscordBot(commands.Bot):
             except KeyError:
                 pass
             return True
+    def remove_cog(self, name):
+        if name in self.cogs:
+            if hasattr(self.cogs[name], 'on_unload'):
+                asyncio.create_task( self.cogs[name].on_unload() )
+        super().remove_cog(name)
     def reloadMod(self, modName):
         _file = str(modName)+'.py'
         if not modName in [x.__name__ for x in self.mods]:
@@ -3407,6 +3412,16 @@ class PtDiscordBot(commands.Bot):
         self.owner_id = app_info.owner.id
     async def start(self, *args, **kwargs):
         # --- Do something after that event loop has been started
+        #invoke cog event on_eventloop_start if present
+        for cog in self.cogs:
+            if hasattr(self.cogs[cog], 'on_eventloop_start'):
+                task = asyncio.create_task( self.cogs[cog].on_eventloop_start() )
+                
+                def done_callback():
+                    exc = task.exception
+                    if exc:
+                        logger.error('Failed to invoke on_eventloop_start event of cog %s: %s: %s' % (cog, exc.__class__.__name__, exc))
+                asyncio.Task.add_done_callback()
         #init authorban timers
         for _user in self.data['user_data']:
             if 'author_ban' in self.data['user_data'][_user]:
@@ -3429,7 +3444,7 @@ class PtDiscordBot(commands.Bot):
                         if int(_guild) not in self.tasks['gab']:
                             self.tasks['gab'][int(_guild)] = {}
                         self.tasks['gab'][int(_guild)][int(_user)] = asyncio.create_task(self.guildadminban_expiry_timer(int(_guild), int(_user)))
-        await super().start(*args)
+        await super().start(*args, **kwargs)
     def formatExactDuration(self, td, language, shorten=False, in_word=False, years=True, months=True, weeks=True, days=True, hours=True, minutes=True, seconds=True):
         '''
         This function formats the exact string of timedelta in the specified language.

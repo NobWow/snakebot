@@ -42,7 +42,7 @@ class State:
 #Default configuration.
 conftemplate = {
     'token':'put your bot token here',
-    'prefix':['.','#'],
+    'prefix':['&', 'sb!'],
     'default_lang':'en_US',
     'owner_permission_bypass': False,
     'messages': {
@@ -2713,6 +2713,11 @@ class PtDiscordBot(commands.Bot):
         async def subcmd2(ctx):
             await ctx.send('This is a subcommand two')
         self.add_command(testgroup)
+    
+    #TODO: command helper chains for mod development & shrink this code
+    async def chc_lang(self, ctx, guild=None):
+        pass
+    
     async def wrapped_convert(self, ctx, converter1, converter2, arg):
         try:
             if ctx.guild:
@@ -2740,7 +2745,8 @@ class PtDiscordBot(commands.Bot):
         elif str(channel).startswith('<#') and str(channel).endswith('>'):
             self.debug_print('findchannel: channel mention is given', 'bot_utility')
             try:
-                channel_id = int( str(channel).removeprefix('<#').removesuffix('>') )
+                strchannel = str(channel)
+                channel_id = int( str(channel)[2:-1] )
             except ValueError:
                 self.debug_print('findchannel: something went wrong', 'bot_utility')
                 raise NotFound(message='Channel with mention %s not found'%channel, response=404, item=channel)
@@ -2774,7 +2780,7 @@ class PtDiscordBot(commands.Bot):
         elif str(category).startswith('<#') and str(category).endswith('>'):
             self.debug_print('findcategory: channel mention is given', 'bot_utility')
             try:
-                channel_id = int( str(category).removeprefix('<#').removesuffix('>') )
+                channel_id = int( str(category)[2:-1] )
             except ValueError:
                 self.debug_print('findcategory: something went wrong', 'bot_utility')
                 raise NotFound(message='channel with mention %s not found'%category, response=404, item=category)

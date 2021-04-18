@@ -1,0 +1,60 @@
+{
+ "token": "put your bot token here",
+ "prefix": [
+  "&",
+  "sb!"
+ ],
+ "default_lang": "en_US",
+ "owner_permission_bypass": false,
+ "messages": {
+  "check_failures": {
+   "embed": true,
+   "use_icon": false,
+   "icon_url": "https://example.com",
+   "color": 16711680,
+   "show_undefined": false
+  },
+  "command_errors": {
+   "embed": true,
+   "use_icon": false,
+   "icon_url": "https://example.com",
+   "color": 16711680,
+   "show_undefined": false
+  },
+  "common_errors": {
+   "embed": true,
+   "use_icon": false,
+   "icon_url": "https://example.com",
+   "color": 16711680,
+   "show_undefined": false
+  },
+  "custom_errors": {
+   "embed": true,
+   "use_icon": false,
+   "icon_url": "https://example.com",
+   "color": 16711680,
+   "show_undefined": false
+  },
+  "notifications": {
+   "embed": true,
+   "use_icon": false,
+   "icon_url": "https://example.com",
+   "color": 16715520
+  },
+  "info": {
+   "embed": true,
+   "use_icon": false,
+   "icon_url": "https://example.com",
+   "color": 1710847
+  },
+  "warning": {
+   "embed": true,
+   "use_icon": false,
+   "icon_url": "https://example.com",
+   "color": 16776960
+  },
+  "response": {
+   "embed": false
+  }
+ }
+}

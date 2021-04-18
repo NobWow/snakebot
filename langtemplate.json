@@ -1,0 +1,659 @@
+{
+ "name": "English (US)",
+ "contents": {
+  "formats": {
+   "date_format": "%(dow_sname_capital)s, %(month_sname_capital)s %(day)s. %(year)s. %(12-hour)s:%(minute)s %(meridiem)s",
+   "duration": {
+    "seconds": {
+     "1": "second",
+     "2": "seconds"
+    },
+    "secs": {
+     "1": "sec",
+     "2": "secs"
+    },
+    "minutes": {
+     "1": "minute",
+     "2": "minutes"
+    },
+    "mins": {
+     "1": "min",
+     "2": "mins"
+    },
+    "hours": {
+     "1": "hour",
+     "2": "hours"
+    },
+    "hs": {
+     "1": "h"
+    },
+    "days": {
+     "1": "day",
+     "2": "days"
+    },
+    "ds": {
+     "1": "d"
+    },
+    "weeks": {
+     "1": "week",
+     "2": "weeks"
+    },
+    "ws": {
+     "1": "w"
+    },
+    "months": {
+     "1": "month",
+     "2": "months"
+    },
+    "mons": {
+     "1": "mon"
+    },
+    "years": {
+     "1": "year",
+     "2": "years"
+    },
+    "ys": {
+     "1": "y"
+    },
+    "direction": {
+     "before": "left",
+     "after": "ago"
+    }
+   },
+   "days_of_week": {
+    "1": "monday",
+    "2": "tuesday",
+    "3": "wednesday",
+    "4": "thursday",
+    "5": "friday",
+    "6": "saturday",
+    "7": "sunday"
+   },
+   "dow": {
+    "1": "mon",
+    "2": "tue",
+    "3": "wed",
+    "4": "thu",
+    "5": "fri",
+    "6": "sat",
+    "7": "sun"
+   },
+   "months": {
+    "1": "january",
+    "2": "february",
+    "3": "march",
+    "4": "april",
+    "5": "may",
+    "6": "june",
+    "7": "july",
+    "8": "august",
+    "9": "september",
+    "10": "october",
+    "11": "november",
+    "12": "december"
+   },
+   "mons": {
+    "1": "jan",
+    "2": "feb",
+    "3": "mar",
+    "4": "apr",
+    "5": "may",
+    "6": "jun",
+    "7": "jul",
+    "8": "aug",
+    "9": "sep",
+    "10": "oct",
+    "11": "nov",
+    "12": "dec"
+   },
+   "logic": {
+    "true": "yes",
+    "false": "no",
+    "partially": "partially",
+    "none": "not set"
+   },
+   "date_relative": {
+    "today": "today",
+    "tomorrow": "tomorrow",
+    "yesterday": "yesterday",
+    "never": "never",
+    "forever": "forever",
+    "now": "now",
+    "in_exact_time": "in"
+   },
+   "switch": {
+    "on": "turned on",
+    "off": "turned off"
+   }
+  },
+  "messages": {
+   "check_failures": {
+    "title": "Action is forbidden.",
+    "description": "--- %(exception)s",
+    "definitions": {
+     "AuthorBan": {
+      "title": "Action is forbidden.",
+      "description": "You have been banned from this bot by author.\nReason: %(reason)s.",
+      "footer": "Expiration date: %(date_exp)s"
+     },
+     "AuthorAdministrationBan": {
+      "title": "Administration of this guild is forbidden.",
+      "description": "The bot control has been banned on this guild by author.\nReason: %(reason)s.",
+      "footer": "Expiration date: %(date_exp)s"
+     },
+     "AuthorBanHere": {
+      "title": "Action is forbidden here.",
+      "description": "You have been banned from this bot by author from here.\nReason: %(reason)s.",
+      "footer": "Expiration date: %(date_exp)s"
+     },
+     "AuthorBanGuild": {
+      "title": "This guild is forbidden.",
+      "description": "This guild has been banned from this bot by author.\nReason: %(reason)s.\nbut anyway you can use bot in DM's or on another guilds.",
+      "footer": "Expiration date: %(date_exp)s"
+     },
+     "GuildAdminBan": {
+      "title": "Action is forbidden here.",
+      "description": "You have been banned from this bot by guild's admin from this guild.\nReason: %(reason)s.",
+      "footer": "Expiration date: %(date_exp)s"
+     },
+     "GuildAdminBanHere": {
+      "title": "Action is forbidden here.",
+      "description": "You have been banned from this bot by guild's admin from here.\nReason: %(reason)s.",
+      "footer": "Expiration date: %(date_exp)s"
+     },
+     "GuildAdminBlockChannel": {
+      "title": "This channel is blocked.",
+      "description": "You can't use bot commands in this channel."
+     },
+     "GuildAdminBlockCategory": {
+      "title": "This category is blocked.",
+      "description": "You can't use bot commands in this category."
+     },
+     "NotOwner": {
+      "title": "Action is forbidden.",
+      "description": "This command is allowed for bot author only."
+     },
+     "InsufficientPoints": {
+      "title": "Not enough points!",
+      "description": "You need at least %(price)s points (%(insuf)s need more.) in order to perform that payment."
+     },
+     "InsufficientGuildPoints": {
+      "title": "Not enough guild points!",
+      "description": "You need at least %(price)s guild points (%(insuf)s need more.) in order to perform that payment."
+     },
+     "NoPrivateMessage": {
+      "title": "Don't use it here.",
+      "description": "You cannot use that command in DM's"
+     },
+     "PrivateMessageOnly": {
+      "title": "Don't use it here.",
+      "description": "You can use that command in bot DM only."
+     },
+     "MissingPermissions": {
+      "title": "You don't have enough permissions.",
+      "description": "You need to have \"%(missing_perms)s\" in order to perform that command."
+     },
+     "BotMissingPermissions": {
+      "title": "The bot doesn't have enough permissions.",
+      "description": "I need at least \"%(missing_perms)s\" in order to perform that command here."
+     },
+     "MissingRole": {
+      "title": "Action is forbidden.",
+      "description": "You don't have a %(role_mention)s role."
+     },
+     "BotMissingRole": {
+      "title": "The bot doesn't have a %(role_mention)s role.",
+      "description": "I can't perform this action without this role."
+     },
+     "MissingAnyRole": {
+      "title": "Action is forbidden.",
+      "description": "You do not have (at least one) these roles: %(role_mentions)s"
+     },
+     "BotMissingAnyRole": {
+      "title": "The bot doesn't have at least one role to do that.",
+      "description": "I need at least one of those roles: %(role_mentions)s"
+     },
+     "NSFWChannelRequired": {
+      "title": "This is not allowed here.",
+      "description": "This command is allowed for NSFW channel only."
+     },
+     "NotAllowed": {
+      "title": "Action is forbidden.",
+      "description": "You cannot perform this action here."
+     },
+     "NotAllowedBypass": {
+      "title": "Action performance rejected.",
+      "description": "Stop! You do not have permission issued by the guild owner for this action.",
+      "footer": "If you're a bad guy, you can bypass this restriction, but you aren't?"
+     }
+    }
+   },
+   "command_errors": {
+    "title": "An unknown error has occurred.",
+    "description": "Please, contact to the author",
+    "definitions": {
+     "MissingRequiredArgument": {
+      "title": "Missing argument.",
+      "description": "You have missed the \"%(param)s\" parameter."
+     },
+     "TooManyArguments": {
+      "title": "Too many arguments.",
+      "description": "This command does not require so much arguments."
+     },
+     "CommandNotFound": {
+      "title": "Unknown command.",
+      "description": "We don't know that command you invoked, \nif you want to see the full list of available commands, type **help**"
+     },
+     "DisabledCommand": {
+      "title": "Command is inavailable currently.",
+      "description": "We're disabled this command due to several malfunctions and/or we're still working on this issue"
+     },
+     "CommandOnCooldown": {
+      "title": "Too fast.",
+      "description": "Please wait %(retry_after)s seconds and run this command again."
+     },
+     "UnexpectedQuoteError": {
+      "title": "Unexpected quote.",
+      "description": "The symbol %(quote)s was unexpected here."
+     },
+     "InvalidEndOfQuotedStringError": {
+      "title": "Invalid character after quoted string.",
+      "description": "The symbol %(char)s was unexpected after quoted string.\nDid you forgot to separate the quoted string with the space?"
+     },
+     "ExpectedClosingQuoteError": {
+      "title": "Closing quote expected, but not found.",
+      "description": "Did you just forgot to enclose argument with second quote?"
+     },
+     "InvalidDuration": {
+      "title": "Error occurred while parsing duration argument.",
+      "description": "Invalid duration node: \"%(invalid_node)s\""
+     },
+     "InvalidNumber": {
+      "title": "Error occurred while parsing number argument.",
+      "description": "Invalid number: \"%(invalid_number)s\""
+     },
+     "Busy": {
+      "title": "Busy",
+      "description": "There are already running task. Wait for it and then repeat the command."
+     }
+    }
+   },
+   "common_errors": {
+    "title": "Error",
+    "description": "--- %(error)s",
+    "definitions": {
+     "Forbidden": {
+      "title": "We do not have access.",
+      "description": "Sorry but this couldn't be done because we were forbidden to perform that action for some reason. "
+     },
+     "NotFound": {
+      "title": "Not found.",
+      "description": "Couldn't find \"%(item)s\"."
+     }
+    }
+   },
+   "custom_errors": {
+    "title": "Error",
+    "description": "An unknown error.",
+    "definitions": {
+     "no_langs": {
+      "title": "No available languages",
+      "description": "We didn't found any available languages. Please report this issue to the bot's author."
+     },
+     "non_abanned": {
+      "title": "This user isn't banned",
+      "description": "The user %(user_name)s#%(user_discriminator)s isn't author-banned."
+     },
+     "non_banned": {
+      "title": "This user isn't banned",
+      "description": "The user %(user_name)s#%(user_discriminator)s isn't banned."
+     },
+     "non_aadminbanned": {
+      "title": "The administration of this guild isn't banned",
+      "description": "The administration of the guild %(guild_name)s isn't banned."
+     },
+     "non_abanned_guild": {
+      "title": "This guild isn't banned",
+      "description": "The guild %(guild_name)s isn't banned."
+     },
+     "non_banned_here": {
+      "title": "This user isn't banned here",
+      "description": "The user %(user_name)s#%(user_discriminator)s isn't banned at #%(channel_name)s."
+     },
+     "no_ban_self": {
+      "title": "Wrong user",
+      "description": "You cannot ban yourself."
+     },
+     "no_ban_guild_owner": {
+      "title": "Wrong user",
+      "description": "You cannot ban a guild owner."
+     },
+     "no_ban_higher_lpl": {
+      "title": "Wrong user",
+      "description": "You cannot ban a member, who have a higher permission level."
+     },
+     "no_block_channel": {
+      "title": "This channel isn't blocked",
+      "description": "Commands are already enabled on the %(channel)s"
+     },
+     "no_block_category": {
+      "title": "This category isn't blocked",
+      "description": "Commands are already enabled on the %(category)s"
+     },
+     "abort_nothing": {
+      "title": "Nothing to abort",
+      "description": "There's no running task right now."
+     },
+     "no_with_owner": {
+      "title": "Action is forbidden",
+      "description": "You cannot do that with guild's owner."
+     },
+     "no_with_higher_lpl": {
+      "title": "Action is forbidden",
+      "description": "You cannot do that with the member, who have higher permission level."
+     }
+    }
+   },
+   "response": {
+    "description": "--- %(response)s",
+    "definitions": {
+     "lang": {
+      "description": "Your current language is %(name)s (%(langcode)s)."
+     },
+     "lang_of_user": {
+      "description": "%(user_name)s#%(user_discriminator)s's language is %(name)s (%(langcode)s)."
+     },
+     "lang_of_guild": {
+      "description": "%(guild_name)s's language is %(name)s (%(langcode)s)."
+     },
+     "notify_channel": {
+      "description": "%(guild_name)s's notify channel is #%(channel_name)s"
+     }
+    }
+   },
+   "info": {
+    "definitions": {
+     "abort": {
+      "title": "Successful",
+      "description": "Current task has been aborted."
+     },
+     "lang_list": {
+      "title": "Language list",
+      "description": "Currently available languages (%(count)s): \n%(list)s"
+     },
+     "lang_set": {
+      "title": "Language changed successfully",
+      "description": "Your current language now: %(name)s (%(langcode)s)."
+     },
+     "lang_set_user": {
+      "title": "Language changed successfully for user %(user_name)s#%(user_discriminator)s",
+      "description": "%(user_name)s's current language now: %(name)s (%(langcode)s)."
+     },
+     "lang_set_guild": {
+      "title": "Language successfully changed for the guild",
+      "description": "%(guild_name)s's current language now: %(name)s (%(langcode)s)."
+     },
+     "authorban_banned": {
+      "title": "Banned successfully",
+      "description": "User %(user_name)s#%(user_discriminator)s author-banned successfully.\nWith reason: %(reason)s\nBan expires at **%(date_exp)s**."
+     },
+     "authorban_unbanned": {
+      "title": "Unbanned successfully",
+      "description": "User %(user_name)s#%(user_discriminator)s author-unbanned successfully."
+     },
+     "authorban_banned_here": {
+      "title": "Banned successfully",
+      "description": "User %(user_name)s#%(user_discriminator)s author-banned at #%(channel_name)s successfully.\nWith reason: %(reason)s\nBan expires at **%(date_exp)s**."
+     },
+     "authorban_unbanned_here": {
+      "title": "Unbanned successfully",
+      "description": "User %(user_name)s#%(user_discriminator)s author-unbanned at #%(channel_name)s successfully."
+     },
+     "authorban_list": {
+      "title": "Author Ban List (%(banned_count)s)",
+      "fields": {
+       "name": "%(user_name)s#%(user_discriminator)s (%(user_id)s):",
+       "value": "Ban reason: %(reason)s\nExpiration date: %(date_exp)s."
+      }
+     },
+     "authoradminban_banned": {
+      "title": "Banned successfully",
+      "description": "Administration of the guild %(guild_name)s has been banned successfully.\nWith reason: %(reason)s\nBan expires at **%(date_exp)s**."
+     },
+     "authoradminban_unbanned": {
+      "title": "Unbanned successfully",
+      "description": "Administration of the guild %(guild_name)s unbanned successfully."
+     },
+     "authoradminban_list": {
+      "title": "Author administration banned guilds list (%(banned_count)s)",
+      "fields": {
+       "name": "%(guild_name)s (%(guild_id)s):",
+       "value": "Ban reason: %(reason)s\nExpiration date: %(date_exp)s."
+      }
+     },
+     "authorban_places_list": {
+      "title": "Author Place-Ban List (%(banned_count)s)",
+      "fields": {
+       "name": "%(user_name)s#%(user_discriminator)s (%(user_id)s)\nat #%(channel_name)s of %(guild_name)s:",
+       "value": "Ban reason: %(reason)s\nExpiration date: %(date_exp)s."
+      }
+     },
+     "authorban_banned_guild": {
+      "title": "Banned successfully",
+      "description": "Guild %(guild_name)s author-banned successfully.\nWith reason: %(reason)s\nBan expires at **%(date_exp)s**."
+     },
+     "authorban_unbanned_guild": {
+      "title": "Unbanned successfully",
+      "description": "Guild %(guild_name)s author-unbanned successfully."
+     },
+     "authorban_guild_list": {
+      "title": "Author Banned Guild List (%(banned_count)s)",
+      "fields": {
+       "name": "%(guild_name)s (%(guild_id)s):",
+       "value": "Ban reason: %(reason)s\nExpiration date: %(date_exp)s."
+      }
+     },
+     "guild_admin_ban": {
+      "title": "Banned successfully",
+      "description": "User %(user_name)s#%(user_discriminator)s banned successfully.\nWith reason: %(reason)s\nBan expires at **%(date_exp)s**."
+     },
+     "guild_admin_unban": {
+      "title": "Unbanned successfully",
+      "description": "User %(user_name)s#%(user_discriminator)s unbanned successfully."
+     },
+     "guild_admin_ban_here": {
+      "title": "Banned successfully",
+      "description": "User %(user_name)s#%(user_discriminator)s banned successfully at channel #%(channel_name)s.\nWith reason: %(reason)s\nBan expires at **%(date_exp)s**."
+     },
+     "guild_admin_unban_here": {
+      "title": "Unbanned successfully",
+      "description": "User %(user_name)s#%(user_discriminator)s unbanned successfully."
+     },
+     "guild_admin_ban_list": {
+      "title": "Banned Members (%(banned_count)s)",
+      "description": "**Note:** these members may not be banned from this guild.",
+      "fields": {
+       "name": "%(user_name)s#%(user_discriminator)s:",
+       "value": "Ban reason: %(reason)s\nExpiration date: %(date_exp)s."
+      }
+     },
+     "guild_admin_channel_blocked": {
+      "title": "Channel blocked",
+      "description": "Bot commands are now disabled in the channel %(channel)s"
+     },
+     "guild_admin_category_blocked": {
+      "title": "Category blocked",
+      "description": "Bot commands are now disabled in the channels of the category %(category)s"
+     },
+     "guild_admin_channel_unblocked": {
+      "title": "Channel allowed",
+      "description": "Bot commands are now enabled in the channel %(channel)s"
+     },
+     "guild_admin_category_unblocked": {
+      "title": "Category allowed",
+      "description": "Bot commands are now enabled in the channels of the category %(category)s"
+     },
+     "lpl_set": {
+      "title": "Permission level successfully set",
+      "description": "User %(user_name)s#%(user_discriminator)s's permission level is %(lpl_value)s now."
+     },
+     "lpl_role_set": {
+      "title": "Permission level successfully set",
+      "description": "Member role %(role_name)s's permission level is %(lpl_value)s now."
+     },
+     "remote_toggle": {
+      "title": "Remote access changed successfully",
+      "description": "Remote access to the %(guild_name)s for the user %(user_name)s#%(user_discriminator)s has been %(switch)s."
+     },
+     "remote_list": {
+      "title": "Remote users",
+      "description": "%(list)s"
+     },
+     "notify_channel_set": {
+      "title": "Notify channel updated",
+      "description": "Channel #%(channel_name)s has been set as notify channel."
+     }
+    }
+   },
+   "notifications": {
+    "title": "Incoming notification",
+    "description": "No description",
+    "definitions": {
+     "authorban_banned": {
+      "title": "You has been banned from this bot",
+      "description": "You got banned by the bot's author.\nBecause of this, you're unable to use this bot anywhere from now,\nuntil it expires or the bot's author manually removes the ban.\nReason: %(reason)s\nExpiration date: %(date_exp)s."
+     },
+     "authorban_unbanned": {
+      "title": "Your ban has been removed from this bot",
+      "description": "Now you can use this bot from now."
+     },
+     "authorban_banned_here": {
+      "title": "You has been banned from this bot locally",
+      "description": "You got banned by the bot's author at channel #%(channel_name)s of the guild %(guild_name)s.\nBecause of this, you're unable to use this bot at this place from now,\nuntil it expires or the bot's author manually removes the ban.\nReason: %(reason)s\nExpiration date: %(date_exp)s."
+     },
+     "authorban_unbanned_here": {
+      "title": "Your ban has been removed from this bot locally",
+      "description": "Now you can use this bot at channel #%(channel_name)s of the guild %(guild_name)s from now."
+     },
+     "authoradminban_banned_ownerdm": {
+      "title": "Your guild has been banned from administration",
+      "description": "One of your guilds with name %(guild_name)s has been banned from administration by author.\nNeither you nor administrators couldn't use administration or moderation tools on that guild and also unable to change some settings from now,\nuntil it expires or the bot's author manually removes the ban.\nReason: %(reason)s\nExpiration date: %(date_exp)s."
+     },
+     "authoradminban_unbanned_ownerdm": {
+      "title": "Your guild has been unbanned from administration",
+      "description": "Bot administration on the guild %(guild_name)s has been unlocked."
+     },
+     "authoradminban_banned": {
+      "title": "This guild has been banned from administration",
+      "description": "The administration features of this bot is locked on this guild from now by the bot author.\nYou are unable to **configure** features of that guild and also use moderation or administration commands, but you still able to **use** features of that bot."
+     },
+     "authoradminban_unbanned": {
+      "title": "This guild has been unbanned from administration",
+      "description": "Administration, features settings and moderation commands has been unlocked."
+     },
+     "authorban_banned_guild_ownerdm": {
+      "title": "Your guild has been banned from this bot",
+      "description": "One of your guilds with name %(guild_name)s has been banned from this bot by author. The bot will no longer maintain your guild and all functions of the bot is unable on this guild from now, \nuntil it expires or the bot's author manually removes the ban.\nReason: %(reason)s\nExpiration date: %(date_exp)s.\nThe members of your guild is also unable to use bot on your guild, but they can use it in other places."
+     },
+     "authorban_unbanned_guild_ownerdm": {
+      "title": "Your guild has been unbanned from this bot",
+      "description": "Bot usage on guild %(guild_name)s has been unlocked."
+     },
+     "authorban_banned_guild": {
+      "title": "This guild has been banned from this bot",
+      "description": "The functionality of the bot is locked on this guild from now by the bot author. \nYou cannot use bot on this guild until it expires or the bot's author manually removes the ban.\nReason: %(reason)s\nExpiration date: %(date_exp)s.",
+      "footer": "The bot is still available in DMs or another guilds."
+     },
+     "authorban_unbanned_guild": {
+      "title": "The ban has been removed from this guild",
+      "description": "The functionality of the bot is available for this guild now."
+     },
+     "guild_admin_ban": {
+      "title": "You got banned from %(guild_name)s",
+      "description": "The guild administrator has just banned you from the guild.\nReason: %(reason)s\nExpiration date: %(date_exp)s."
+     },
+     "guild_admin_ban_here": {
+      "title": "You got locally banned at %(guild_name)s",
+      "description": "The guild administrator has just banned you at the channel #%(channel_name)s of the guild %(guild_name)s by it's administrator.\nYou cannot use bot commands and use most of the bot's functionality in that channel.\nReason: %(reason)s\nExpiration date: %(date_exp)s."
+     },
+     "guild_admin_unban": {
+      "title": "Your ban has been removed from %(guild_name)s",
+      "description": "Now you can join to this guild."
+     },
+     "guild_admin_unban_here": {
+      "title": "Your ban has been removed at channel #%(channel_name)s of the guild %(guild_name)s",
+      "description": "Now you're able to use bot in that channel."
+     },
+     "moderator_warning": {
+      "title": "Warning from %(guild_name)s",
+      "description": "%(warning)s"
+     }
+    }
+   }
+  },
+  "permissions": {
+   "create_instant_invite": "create instant invite",
+   "kick_members": "kick members",
+   "ban_members": "ban members",
+   "administrator": "administrator",
+   "manage_channels": "manage channels",
+   "manage_guild": "manage guild",
+   "add_reactions": "react",
+   "view_audit_log": "view audit log",
+   "priority_speaker": "priority speaker",
+   "stream": "stream",
+   "read_messages": "read messages",
+   "send_messages": "send messages",
+   "send_tts_messages": "send tts messages",
+   "manage_messages": "manage messages",
+   "embed_links": "embed links",
+   "attach_files": "attach files",
+   "read_message_history": "read message history",
+   "mention_everyone": "mention everyone",
+   "external_emojis": "use external emojis",
+   "connect": "connect",
+   "speak": "speak",
+   "mute_members": "mute members",
+   "deafen_members": "deafen members",
+   "use_voice_activation": "use voice activation",
+   "change_nickname": "change nickname",
+   "manage_nicknames": "manage nicknames",
+   "manage_roles": "manage roles",
+   "manage_emojis": "manage emojis",
+   "manage_webhooks": "manage webhooks"
+  },
+  "audit_log_actions": {
+   "guild_update": "guild updated",
+   "channel_create": "channel created",
+   "channel_update": "channel updated",
+   "channel_delete": "channel deleted",
+   "overwrite_create": "permission overwrite set",
+   "overwrite_update": "permission overwrite changed",
+   "overwrite_delete": "permission overwrite unset",
+   "kick": "member kicked",
+   "member_prune": "member pruned",
+   "ban": "member banned",
+   "unban": "member unbanned",
+   "member_update": "member updated",
+   "member_role_update": "member role updated",
+   "role_create": "role created",
+   "role_update": "role updated",
+   "role_delete": "role deleted",
+   "invite_create": "invite link created",
+   "invite_update": "invite link updated",
+   "invite_delete": "invite link deleted",
+   "webhook_create": "webhook created",
+   "webhook_update": "webhook updated",
+   "webhook_delete": "webhook deleted",
+   "emoji_create": "emoji created",
+   "emoji_update": "emoji updated",
+   "emoji_delete": "emoji deleted",
+   "message_delete": "message deleted"
+  },
+  "audit_log_action_category": {
+   "create": "creation",
+   "update": "updating",
+   "delete": "deletion"
+  }
+ }
+}
